@@ -9,9 +9,13 @@ public class Principal {
     private static List<Funcionario> funcionarios;
 
     public static void main(String[] args) {
-        System.out.println("Inserir funcionarios na lista... ");
+        System.out.println("Inserir funcionários na lista... ");
         inicializarFuncionarios();
-        System.out.println("Funcionarios inseridos com sucesso!");
+        System.out.println("Funcionários inseridos com sucesso!");
+
+        System.out.println("Remover funcionário João... ");
+        removerFuncionarioPorNome("João");
+        System.out.println("Funcionário removido com sucesso!");
     }
 
     public static void inicializarFuncionarios(){
@@ -27,5 +31,12 @@ public class Principal {
                 new Funcionario("Heloísa", LocalDate.of(2003,  5, 24), new BigDecimal("1606.85"), "Eletricista"),
                 new Funcionario("Helena",  LocalDate.of(1996,  9,  2), new BigDecimal("2799.93"), "Gerente")
         ));
+    }
+
+    public static void removerFuncionarioPorNome(String nome) {
+        boolean removido = funcionarios.removeIf(f -> f.getNome().equals(nome));
+        if (!removido) {
+            System.out.println("Funcionário '" + nome + "' não encontrado.");
+        }
     }
 }
