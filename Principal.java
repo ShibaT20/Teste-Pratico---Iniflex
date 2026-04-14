@@ -1,11 +1,10 @@
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class Principal {
 
@@ -23,6 +22,23 @@ public class Principal {
         System.out.println("Imprimindo funcionários...");
         imprimirFuncionarios();
         System.out.println("Fim da impressão dos funcionários");
+
+        System.out.println("Aplicando aumento de 10%...");
+        aplicarAumentoGeral(new BigDecimal("1.10"));
+        System.out.println("Aumento aplicado com sucesso!");
+
+        System.out.println("Agrupando funcionários por função...");
+        Map<String, List<Funcionario>> funcionariosPorFuncao = agruparPorFuncao();
+        System.out.println("Funcionários agrupados com sucesso!");
+
+        System.out.println("Imprimindo funcionários por função...");
+        imprimirFuncionariosPorFuncao(funcionariosPorFuncao);
+        System.out.println("Fim da impressão dos funcionários por função");
+
+        System.out.println("Aniversariantes em outubro e dezembro...");
+        imprimirAniversariantesPorMes(10, 12);
+        System.out.println("Fim da impressão dos Aniversariantes");
+
     }
 
     public static void inicializarFuncionarios(){
@@ -62,6 +78,41 @@ public class Principal {
         ));
     }
 
-    
+    public static void aplicarAumentoGeral(BigDecimal percentual) {
+        funcionarios.forEach(f ->
+                f.setSalario(f.getSalario().multiply(percentual).setScale(2, RoundingMode.HALF_UP))
+        );
+    }
+
+    public static Map<String, List<Funcionario>> agruparPorFuncao() {
+        return funcionarios.stream()
+                .collect(Collectors.groupingBy(Funcionario::getFuncao));
+    }
+
+    public static void imprimirFuncionariosPorFuncao(Map<String, List<Funcionario>> funcionariosPorFuncao) {
+        funcionariosPorFuncao.forEach((funcao, lista) -> {
+            System.out.println("\n[ " + funcao + " ]");
+            lista.forEach(f -> System.out.printf(
+                    "  Nome: %s | Nascimento: %s | Salário: %s%n",
+                    f.getNome(),
+                    f.getDataNascimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                    NumberFormat.getNumberInstance(new Locale("pt", "BR")).format(f.getSalario())
+            ));
+        });
+    }
+
+    public static void imprimirAniversariantesPorMes(int... meses) {
+        Set<Integer> mesesFiltro = Arrays.stream(meses)
+                .boxed()
+                .collect(Collectors.toSet());
+
+        funcionarios.stream()
+                .filter(f -> mesesFiltro.contains(f.getDataNascimento().getMonthValue()))
+                .forEach(f -> System.out.printf(
+                        "Nome: %s | Nascimento: %s%n",
+                        f.getNome(),
+                        f.getDataNascimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                ));
+    }
 
 }
