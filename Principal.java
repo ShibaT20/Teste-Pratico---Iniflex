@@ -1,8 +1,11 @@
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class Principal {
 
@@ -16,6 +19,10 @@ public class Principal {
         System.out.println("Remover funcionário João... ");
         removerFuncionarioPorNome("João");
         System.out.println("Funcionário removido com sucesso!");
+
+        System.out.println("Imprimindo funcionários...");
+        imprimirFuncionarios();
+        System.out.println("Fim da impressão dos funcionários");
     }
 
     public static void inicializarFuncionarios(){
@@ -39,4 +46,22 @@ public class Principal {
             System.out.println("Funcionário '" + nome + "' não encontrado.");
         }
     }
+
+    public static void imprimirFuncionarios() {
+        DateTimeFormatter fmtData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        NumberFormat fmtSalario = NumberFormat.getNumberInstance(new Locale("pt", "BR"));
+        fmtSalario.setMinimumFractionDigits(2);
+        fmtSalario.setMaximumFractionDigits(2);
+
+        funcionarios.forEach(f -> System.out.printf(
+                "Nome: %s | Nascimento: %s | Salário: %s | Função: %s%n",
+                f.getNome(),
+                f.getDataNascimento().format(fmtData),
+                fmtSalario.format(f.getSalario()),
+                f.getFuncao()
+        ));
+    }
+
+    
+
 }
