@@ -2,6 +2,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -11,33 +12,37 @@ public class Principal {
     private static List<Funcionario> funcionarios;
 
     public static void main(String[] args) {
-        System.out.println("Inserir funcionários na lista... ");
+        System.out.println("\n=== 3.1 - Inserindo funcionários ===");
         inicializarFuncionarios();
-        System.out.println("Funcionários inseridos com sucesso!");
 
-        System.out.println("Remover funcionário João... ");
+        System.out.println("\n=== 3.2 - Removendo funcionário 'João' ===");
         removerFuncionarioPorNome("João");
-        System.out.println("Funcionário removido com sucesso!");
 
-        System.out.println("Imprimindo funcionários...");
+        System.out.println("\n=== 3.3 - Lista de funcionários ===");
         imprimirFuncionarios();
-        System.out.println("Fim da impressão dos funcionários");
 
-        System.out.println("Aplicando aumento de 10%...");
+        System.out.println("\n=== 3.4 - Aplicando aumento de 10% ===");
         aplicarAumentoGeral(new BigDecimal("1.10"));
-        System.out.println("Aumento aplicado com sucesso!");
 
-        System.out.println("Agrupando funcionários por função...");
+        System.out.println("\n=== 3.5 / 3.6 - Funcionários agrupados por função ===");
         Map<String, List<Funcionario>> funcionariosPorFuncao = agruparPorFuncao();
-        System.out.println("Funcionários agrupados com sucesso!");
-
-        System.out.println("Imprimindo funcionários por função...");
         imprimirFuncionariosPorFuncao(funcionariosPorFuncao);
-        System.out.println("Fim da impressão dos funcionários por função");
 
-        System.out.println("Aniversariantes em outubro e dezembro...");
+        System.out.println("\n=== 3.8 - Aniversariantes em outubro e dezembro ===");
         imprimirAniversariantesPorMes(10, 12);
-        System.out.println("Fim da impressão dos Aniversariantes");
+
+        System.out.println("\n=== 3.9 - Funcionário com maior idade ===");
+        imprimirFuncionarioMaisVelho();
+
+        System.out.println("\n=== 3.10 - Funcionários em ordem alfabética ===");
+        imprimirFuncionariosOrdemAlfabetica();
+
+        System.out.println("\n=== 3.11 - Total dos salários ===");
+        totalSalariosPagos();
+
+        System.out.println("\n=== 3.12 - Salários mínimos por funcionário ===");
+        imprimirFuncionariosSalarioMinimo();
+
 
     }
 
@@ -113,6 +118,52 @@ public class Principal {
                         f.getNome(),
                         f.getDataNascimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
                 ));
+    }
+
+    public static void imprimirFuncionarioMaisVelho(){
+        funcionarios.stream()
+                .min(Comparator.comparing(Funcionario::getDataNascimento))
+                .ifPresent(f -> {
+                    int idade = Period.between(f.getDataNascimento(), LocalDate.now()).getYears();
+                    System.out.printf("Nome: %s | Idade: %d anos%n", f.getNome(), idade);
+                });
+
+    }
+
+    public static void imprimirFuncionariosOrdemAlfabetica(){
+        funcionarios.stream()
+                .sorted(Comparator.comparing(Funcionario::getNome))
+                .forEach(f -> System.out.printf(
+                        "Nome: %s | Nascimento: %s | Salário: %s | Função: %s%n",
+                        f.getNome(),
+                        f.getDataNascimento().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")),
+                        NumberFormat.getNumberInstance(new Locale("pt", "BR")).format(f.getSalario()),
+                        f.getFuncao()
+                ));
+    }
+
+    public static void totalSalariosPagos(){
+        BigDecimal total = funcionarios.stream()
+                .map(Funcionario::getSalario)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        NumberFormat fmt = NumberFormat.getNumberInstance(new Locale("pt", "BR"));
+        fmt.setMinimumFractionDigits(2);
+        fmt.setMaximumFractionDigits(2);
+
+        System.out.println("Total dos salarios: " + fmt.format(total));
+    }
+
+    public static void imprimirFuncionariosSalarioMinimo(){
+        DateTimeFormatter fmtData = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+        funcionarios.forEach(f -> System.out.printf(
+                "Nome: %s | Nascimento: %s | Função: %s | QT salário minimo: %s%n ",
+                f.getNome(),
+                f.getDataNascimento().format(fmtData),
+                f.getFuncao(),
+                f.getSalario().divide(BigDecimal.valueOf(1212),2, RoundingMode.HALF_UP)
+        ));
     }
 
 }
